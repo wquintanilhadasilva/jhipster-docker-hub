@@ -1,0 +1,28 @@
+version: '2'
+services:
+    sample-app:
+        image: jhipster/jhipster-sample-app-cassandra
+        environment:
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_DATA_CASSANDRA_CONTACTPOINTS=sample-cassandra
+            - JHIPSTER_SLEEP=30
+        ports:
+            - 8080:8080
+    sample-cassandra-node:
+        image: cassandra:2.2.7
+        environment:
+            - CASSANDRA_SEEDS=sample-cassandra
+    sample-cassandra-migration:
+        container_name: sample-cassandra-migration
+        environment:
+            - CASSANDRA_CONTACT_POINT=sample-cassandra
+            - USER=docker-cassandra-migration
+            - CREATE_KEYSPACE_SCRIPT=create-keyspace-prod.cql
+        build:
+            context: .
+            dockerfile: cassandra/Cassandra-Migration.Dockerfile
+        volumes:
+            - ./cql:/cql:ro
+    sample-cassandra:
+        container_name: sample-cassandra
+        image: cassandra:2.2.7
